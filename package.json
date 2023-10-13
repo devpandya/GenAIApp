@@ -2,7 +2,7 @@
   "name": "berry-free-material-react-cra",
   "version": "3.3.2",
   "private": true,
-  "homepage": "https://berrydashboard.io/main",
+  "homepage": "https://https://devpandya.github.io/GenAIApp",
   "dependencies": {
     "@emotion/cache": "^11.9.3",
     "@emotion/react": "^11.9.3",
@@ -35,7 +35,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+     "predeploy": "npm run build",
+    "deploy": "gh-pages -d build" 
   },
   "eslintConfig": {
     "extends": [
@@ -70,6 +72,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "gh-pages": "^6.0.0",
     "immutable": "^4.3.0",
     "prettier": "^2.8.7",
     "sass": "^1.53.0"
