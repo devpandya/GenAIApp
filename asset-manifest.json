@@ -1,0 +1,19 @@
+{
+  "files": {
+    "main.css": "//devpandya.github.io/GenAIApp/static/css/main.df3b6d63.css",
+    "main.js": "//devpandya.github.io/GenAIApp/static/js/main.31013931.js",
+    "static/css/315.983ddd9c.chunk.css": "//devpandya.github.io/GenAIApp/static/css/315.983ddd9c.chunk.css",
+    "static/js/315.e72ac3ea.chunk.js": "//devpandya.github.io/GenAIApp/static/js/315.e72ac3ea.chunk.js",
+    "static/js/411.428c22d4.chunk.js": "//devpandya.github.io/GenAIApp/static/js/411.428c22d4.chunk.js",
+    "static/js/354.cd4a80c4.chunk.js": "//devpandya.github.io/GenAIApp/static/js/354.cd4a80c4.chunk.js",
+    "static/js/224.e8ed7ec0.chunk.js": "//devpandya.github.io/GenAIApp/static/js/224.e8ed7ec0.chunk.js",
+    "static/js/196.4873ef70.chunk.js": "//devpandya.github.io/GenAIApp/static/js/196.4873ef70.chunk.js",
+    "static/media/user-round.svg": "//devpandya.github.io/GenAIApp/static/media/user-round.13b5a31bebd2cc6016d6db2cac8e92d1.svg",
+    "static/media/social-google.svg": "//devpandya.github.io/GenAIApp/static/media/social-google.9887eb8eb43729cb99f402cfa0de3c44.svg",
+    "index.html": "//devpandya.github.io/GenAIApp/index.html"
+  },
+  "entrypoints": [
+    "static/css/main.df3b6d63.css",
+    "static/js/main.31013931.js"
+  ]
+}
