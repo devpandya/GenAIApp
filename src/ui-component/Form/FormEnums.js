@@ -1,0 +1,23 @@
+export const ControlType = {
+  INPUT: 'input',
+  SELECT: 'select',
+  TEXTAREA: 'textarea',
+  AUTO_COMPLETE: 'autoComplete',
+  FILE: 'file',
+  HIDDEN: 'hidden',
+  CHECKBOX: 'checkbox',
+  DATE: 'date',
+  DATETIME: 'datetime',
+  TIME: 'time',
+  IMAGE: 'image',
+  RADIO: 'radio',
+  SWITCH: 'switch',
+  SLIDER: 'slider',
+  RANGE_PICKER: 'rangePicker',
+  DATE_PICKER: 'datePicker',
+  MONTH_PICKER: 'monthPicker',
+  PASSWORD: 'password',
+  SECTION: 'section',
+  NUMBER: 'number',
+  TABLE: 'table'
+};
