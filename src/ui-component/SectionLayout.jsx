@@ -58,12 +58,12 @@ import PropTypes from 'prop-types';
 
 const SectionLayout = ({ id, title, children, className }) => {
     return (
-        <Section id={id} sx={{ width: "100%" }}>
-            <SectionHeader>
+        <Section container flexDirection={"column"}  id={id} sx={{ width: "100%" }}>
+            {title && <SectionHeader>
                 <Grid>
                     <Title>{title}</Title>
                 </Grid>
-            </SectionHeader>
+            </SectionHeader>}
             <SectionContent className={className}>
                 {children}
             </SectionContent>

@@ -13,7 +13,7 @@ const MainRoutes = {
   element: <MainLayout />,
   children: [
     {
-      path: 'main',
+      path: '',
       element: <SamplePage />
     }
   ]

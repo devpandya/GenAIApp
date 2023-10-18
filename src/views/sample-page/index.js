@@ -1,11 +1,14 @@
 // material-ui
-import { Button, Grid, TextField } from '@mui/material';
+import { Button, CircularProgress, Grid, TextField } from '@mui/material';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import Form from 'ui-component/Form';
 import SectionLayout from 'ui-component/SectionLayout';
-import { getGeneratedJSON, getValues, postData } from './service';
+import { generateCodeFromChatGPT, getGeneratedJSON, getValues, postData } from './service';
 import { useCallback } from 'react';
+import { set } from 'immutable';
+import { useRef } from 'react';
+import FixedFooter from 'ui-component/FixedFooter';
 
 const form = {
   id: 'sample-page',
@@ -14,16 +17,38 @@ const form = {
 };
 
 const SamplePage = () => {
-  const { id, title, loading } = form;
+  const { id, title } = form;
+  const [loading, setLoading] = useState(false);
   const [fields, setFields] = useState([]);
   const [text, setText] = useState('');
   const [list, setList] = useState([]);
   const [pageTitle, setPageTitle] = useState('');
   const [selectedId, setSelectedId] = useState(0);
+  const [sections, setSections] = useState([]);
+  const [postData, setPostData] = useState({});
+  const postRef = useRef({});
   const Reset = () => {
     setFields([]);
     setList([]);
     setText('');
+  };
+
+  const clcikRef = useRef([]);
+
+  const registerClick = (section, onClick) => {
+    clcikRef.current.push({ key: section, onClick: onClick });
+  };
+
+  const generatePostData = async (section, data) => {
+    setPostData((prevData) => {
+      postRef.current = { ...prevData, [section]: data };
+      return { ...prevData, [section]: data };
+    });
+  };
+
+  const generateCode = async () => {
+    const resp = await generateCodeFromChatGPT(text);
+    setFields(resp);
   };
   const Back = () => {
     setFields([]);
@@ -35,6 +60,23 @@ const SamplePage = () => {
     console.log('list', listi);
   }, []);
 
+  const executeAllSections = useCallback(
+    async (actionObj) => {
+      const { shouldValidate, id, onClick } = actionObj;
+      debugger;
+      await clcikRef.current.forEach(async (action) => {
+        debugger;
+        await action?.onClick(shouldValidate, async (data) => await generatePostData(action.key, data));
+      });
+      //-for Developer Reference
+      console.log(JSON.stringify(postRef.current));
+      //-for Developer Reference
+      debugger;
+      actionObj.onClick(postRef.current);
+    },
+    [postData]
+  );
+
   const buttons = [
     {
       id: 'submit',
@@ -44,20 +86,22 @@ const SamplePage = () => {
       variant: 'contained',
       color: 'primary',
       validateFields: true,
+      shouldValidate: true,
       onClick: async (data) => {
+        debugger;
         let id = selectedId;
         if (!selectedId) {
           id = list?.length ? list[list.length - 1]?.key + 1 : 1;
         }
-        // const postResult = await postData(id, data);
-        // if (postResult?.status === 200) {
-        //   alert('Data Submitted Successfully');
-        //   await updateList();
-        // } else {
-        //   alert('Data Submission Failed');
-        // }
-
-        setList([...list, { key: id, value: data }]);
+        debugger;
+        let flat = {};
+        const flatObject = Object.keys(data).forEach((key) => {
+          flat = { ...flat, ...data[key] };
+        });
+        debugger;
+        const newList = [...list, { key: id++, value: flat }];
+        debugger;
+        setList(newList);
         setFields([...fields]);
       }
     }
@@ -86,17 +130,69 @@ const SamplePage = () => {
       }
     }
   ];
-
-  if (fields?.length) {
+  const renderButton = (action) => {
+    if (action?.element) {
+      return action?.element;
+    }
     return (
       <>
-        <SectionLayout id={id} title={pageTitle}>
-          <Form initialFields={fields} loading={loading} buttons={[...buttons, ...localActions]}>
-            <Grid container key="fields" spacing="20" sx={{ my: 2 }}></Grid>
-            <Grid container key="buttons" spacing="20" gap={2} p={2} sx={{ my: 2 }}></Grid>
-          </Form>
-        </SectionLayout>
-
+        <Button
+          sx={{ mr: '10px' }}
+          id={action.key}
+          onClick={(e) => executeAllSections(action)}
+          disabled={loading || action?.disabled}
+          color={action.color}
+          variant={action.variant}
+        >
+          {action.label}
+        </Button>
+        {action?.modalComponent && action?.id === modalData?.id ? (
+          <action.modalComponent
+            open={true}
+            popupName={action?.popupName}
+            role={userInfo?.selectedRole?.role}
+            onHandleClose={closeHandler}
+            onSave={saveHandler}
+            onReset={resetSectionHandler}
+            entityName={selectedMasterRef.current?.key}
+          />
+        ) : null}
+      </>
+    );
+  };
+  if (fields?.length) {
+    return (
+      <Grid container flexDirection={'column'} sx={{ width: '50%', margin: 'auto' }}>
+        {sections?.length ? (
+          sections.map((section) => {
+            return (
+              <SectionLayout id={section?.id} title={section?.title}>
+                <Form
+                  registerClick={(onClick) => registerClick(section?.id, onClick)}
+                  initialFields={section.fields}
+                  loading={loading}
+                  buttons={[]}
+                >
+                  <Grid container key="fields" spacing="20" sx={{ my: 2 }}></Grid>
+                  <Grid container key="buttons" spacing="20" gap={2} p={2} sx={{ my: 2 }}></Grid>
+                </Form>
+              </SectionLayout>
+            );
+          })
+        ) : (
+          <SectionLayout id={id} title={pageTitle}>
+            <Form initialFields={fields} loading={loading} buttons={[]} registerClick={(onClick) => registerClick('single', onClick)}>
+              <Grid container key="fields" spacing="20" sx={{ my: 2 }}></Grid>
+              <Grid container key="buttons" spacing="20" gap={2} p={2} sx={{ my: 2 }}></Grid>
+            </Form>
+          </SectionLayout>
+        )}
+        <FixedFooter id="masterLayoutFooter">
+          <Grid container justifyContent={'flex-end'}>
+            {buttons?.map(renderButton)}
+            {localActions?.map(renderButton)}
+          </Grid>
+        </FixedFooter>
         {list.length ? (
           <Grid
             container
@@ -148,36 +244,43 @@ const SamplePage = () => {
             })}
           </Grid>
         ) : null}
-      </>
+      </Grid>
     );
   } else {
     return (
       <Grid container>
-        <SectionLayout id={'textArea'} title={'Add comma seperated keywords to generate a form'}>
+        <SectionLayout id={'textArea'} title={'Paste fields from excel to generate a form'}>
           <Grid container justifyContent={'flex-end'} p={2} gap={2}>
             <TextField
               type="text"
               multiline
               rows={4}
               fullWidth
-              placeholder="Enter comma seperated values"
+              placeholder="Paste fields"
               value={text}
               onChange={({ target }) => setText(target?.value)}
             />
-            <Button
-              onClick={async () => {
-                if (text?.trim()?.length) {
-                  const { locFields, pgTitle } = await getGeneratedJSON(text?.trim());
-                  setPageTitle(pgTitle);
-                  debugger;
-                  setFields(locFields);
-                } else {
-                  setFields([]);
-                }
-              }}
-            >
-              Generate
-            </Button>
+            {loading ? (
+              <CircularProgress />
+            ) : (
+              <Button
+                onClick={async () => {
+                  if (text?.trim()?.length) {
+                    setLoading(true);
+                    const { section, locFields, pgTitle } = await getGeneratedJSON(text?.trim(), setLoading);
+                    setPageTitle(pgTitle);
+                    setFields(locFields);
+                    setSections(section);
+                    setLoading((prev) => !prev);
+                  } else {
+                    setFields([]);
+                    setSections([]);
+                  }
+                }}
+              >
+                Generate
+              </Button>
+            )}
           </Grid>
         </SectionLayout>
       </Grid>

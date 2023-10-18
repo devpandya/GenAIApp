@@ -4,7 +4,7 @@ import { generateMessages, generatePlaceholders } from './FormFunctions';
 import { ControlType } from './FormEnums';
 import './Form.css';
 
-const Form = ({ initialFields, buttons: buttons = [], loading: loading = false, children, translations }) => {
+const Form = ({ initialFields, buttons: buttons = [], loading: loading = false, children, translations, registerClick, }) => {
   const [fields, setFields] = React.useState(initialFields);
   const refFields = React.useRef(fields);
   useEffect(() => {
@@ -68,7 +68,7 @@ const Form = ({ initialFields, buttons: buttons = [], loading: loading = false, 
       } else {
         if (field?.validations?.length > 0) {
           field?.validations?.forEach((validation) => {
-            const message = validation(field);
+            const message = validation(field?.value?.trim() || '');
             if (message) {
               setField(field.key, 'error', generateMessages(translations, message));
               isValid = false;
@@ -98,6 +98,11 @@ const Form = ({ initialFields, buttons: buttons = [], loading: loading = false, 
     }
   };
 
+
+  useEffect(() => {
+    registerClick(onClick);
+  }, []);
+
   /**
    * @description get control by type
    * @param field
@@ -125,7 +130,7 @@ const Form = ({ initialFields, buttons: buttons = [], loading: loading = false, 
       case ControlType.AUTO_COMPLETE:
         return(<Autocomplete
             placeholder={generatePlaceholders(translations,field.placeholder)}
-            helperText={field?.error ? field?.error : ''}
+            helperText={field?.error ? field?.error : ' '}
             isLabelIconVisible={field?.label?.onIconClick  ? true: false}
             label={field?.label?.text}
             onChange={(e) => onChange(e, field)}
@@ -147,7 +152,7 @@ const Form = ({ initialFields, buttons: buttons = [], loading: loading = false, 
             style={{ backgroundColor: 'white' }}
             fullWidth
             error={field?.error ? true : false}
-            helperText={field?.error ? field?.error : ''}
+            helperText={field?.error ? field?.error : ' '}
             onChange={(e) => onChange(e, field)}
             size="small"/>
         );
